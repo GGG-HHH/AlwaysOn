@@ -13,6 +13,9 @@ final class PowerManager {
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-a", "disablesleep", "1")
         // Prevent disk sleep
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-a", "disksleep", "0")
+        // Keep network alive when display sleeps
+        shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-a", "networkoversleep", "1")
+        shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-a", "tcpkeepalive", "1")
         // Let display sleep normally (battery / charger)
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-b", "displaysleep", "1")
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-c", "displaysleep", "5")
@@ -26,6 +29,7 @@ final class PowerManager {
         // Restore defaults using -a so it works on both laptops and desktops
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-a", "disablesleep", "0")
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-a", "disksleep", "10")
+        shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-a", "networkoversleep", "0")
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-b", "sleep", "1")
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-b", "displaysleep", "2")
         shell("/usr/bin/sudo", "-n", "/usr/bin/pmset", "-c", "displaysleep", "5")
