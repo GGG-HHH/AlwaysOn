@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlwaysOn — Your Mac Never Sleeps</title>
+<meta name="description" content="Turn your Mac into a forever-running machine. A 52KB native menu bar app for the age of AI agents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #09090b;
+  --bg-elevated: #111113;
+  --bg-card: #16161a;
+  --border: #222228;
+  --border-hover: #333340;
+  --text-primary: #ededef;
+  --text-secondary: #7a7a85;
+  --text-tertiary: #4a4a52;
+  --accent: #c8ff00;
+  --accent-dim: rgba(200, 255, 0, 0.08);
+  --accent-glow: rgba(200, 255, 0, 0.15);
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Instrument Sans', -apple-system, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── i18n ── */
+[data-lang="zh"] [data-en],
+[data-lang="en"] [data-zh] { display: none; }
+
+/* ── Nav ── */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 24px;
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  background: rgba(9, 9, 11, 0.8);
+  border-bottom: 1px solid var(--border);
+}
+
+nav .nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav .logo {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+nav .logo .pulse {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(200, 255, 0, 0.4); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(200, 255, 0, 0); }
+}
+
+nav .nav-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+nav .nav-links a {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+nav .nav-links a:hover { color: var(--text-primary); }
+
+/* Language toggle */
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.lang-toggle button {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.lang-toggle button:first-child { border-right: 1px solid var(--border); }
+
+.lang-toggle button.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.lang-toggle button:hover:not(.active) { color: var(--text-secondary); }
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-download:hover {
+  box-shadow: 0 0 30px rgba(200, 255, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-download svg { width: 16px; height: 16px; }
+
+/* ── Hero ── */
+.hero {
+  padding: 180px 0 120px;
+  text-align: center;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(200, 255, 0, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  background: var(--bg-elevated);
+}
+
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+h1 {
+  font-family: var(--mono);
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+h1 .accent { color: var(--accent); }
+
+.hero-sub {
+  font-size: clamp(18px, 2.5vw, 22px);
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin: 0 auto 48px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.hero-specs {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hero-specs span { opacity: 0.5; }
+
+/* ── Section headings ── */
+section {
+  padding: 100px 0;
+  border-top: 1px solid var(--border);
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-family: var(--mono);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+.section-desc {
+  color: var(--text-secondary);
+  font-size: 17px;
+  max-width: 520px;
+  margin-bottom: 56px;
+}
+
+/* ── Features ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.feature-card {
+  background: var(--bg);
+  padding: 40px;
+  transition: background 0.3s;
+}
+
+.feature-card:hover { background: var(--bg-elevated); }
+
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(200, 255, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.feature-card h3 {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ── How It Works ── */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.step {
+  position: relative;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg);
+  transition: all 0.3s;
+}
+
+.step:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-elevated);
+}
+
+.step-number {
+  font-family: var(--mono);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent);
+  opacity: 0.15;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.step h3 {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.step p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.step code {
+  font-family: var(--mono);
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* ── Menu Preview ── */
+.menu-preview {
+  max-width: 320px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-card);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.menu-bar {
+  background: rgba(200, 255, 0, 0.06);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.menu-item {
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.menu-item:hover { background: rgba(255,255,255,0.03); }
+.menu-item.active { color: var(--accent); }
+.menu-item .meta { color: var(--text-tertiary); font-size: 12px; }
+.menu-sep { height: 1px; background: var(--border); margin: 4px 16px; }
+.menu-check { color: var(--accent); margin-right: 6px; }
+
+/* ── Usage / FAQ ── */
+.usage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.usage-left h2 { margin-bottom: 20px; }
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.faq-item {
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.faq-question {
+  width: 100%;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.faq-question:hover { background: var(--bg-elevated); }
+
+.faq-question .chevron {
+  color: var(--text-tertiary);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.faq-item.open .chevron { transform: rotate(180deg); }
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.faq-answer-inner {
+  padding: 0 20px 18px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.faq-answer-inner code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--bg-elevated);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--accent);
+}
+
+/* ── Tech ── */
+.tech-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tech-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--bg);
+  transition: all 0.2s;
+}
+
+.tech-tag:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.tech-tag .tag-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* ── Footer ── */
+footer {
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+footer p {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+footer a:hover { color: var(--accent); }
+
+/* ── Animations ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.reveal-stagger.visible > *:nth-child(1) { transition-delay: 0s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.08s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.16s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.24s; opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; gap: 16px; }
+  .usage-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero { padding: 140px 0 80px; }
+  section { padding: 64px 0; }
+  nav .nav-links a.hide-mobile { display: none; }
+  .feature-card { padding: 28px; }
+}
+
+@media (max-width: 480px) {
+  .hero-actions { flex-direction: column; }
+  .hero-specs { flex-direction: column; align-items: center; gap: 2px; }
+  .hero-specs span { display: none; }
+}
+</style>
+</head>
+<body data-lang="en">
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="pulse"></div>
+      AlwaysOn
+    </div>
+    <div class="nav-links">
+      <a href="#features" class="hide-mobile">
+        <span data-en>Features</span><span data-zh>功能</span>
+      </a>
+      <a href="#how-it-works" class="hide-mobile">
+        <span data-en>Setup</span><span data-zh>安装</span>
+      </a>
+      <a href="#faq" class="hide-mobile">FAQ</a>
+      <a href="https://github.com/GGG-HHH/AlwaysOn" class="hide-mobile">GitHub</a>
+      <div class="lang-toggle">
+        <button data-set-lang="en" class="active">EN</button>
+        <button data-set-lang="zh">中</button>
+      </div>
+      <a href="https://github.com/GGG-HHH/AlwaysOn/releases/latest/download/AlwaysOn.zip" class="btn-download">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10"/></svg>
+        Download
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" style="border: none;">
+  <div class="container">
+    <div class="reveal">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        <span data-en>macOS menu bar app</span>
+        <span data-zh>macOS 菜单栏应用</span>
+      </div>
+    </div>
+    <h1 class="reveal" style="transition-delay: 0.1s;">
+      <span data-en>Your Mac<br><span class="accent">Never Sleeps.</span></span>
+      <span data-zh>让你的 Mac<br><span class="accent">永不休眠。</span></span>
+    </h1>
+    <p class="hero-sub reveal" style="transition-delay: 0.2s;">
+      <span data-en>In the age of AI agents, your laptop should run forever.<br>One click. No config. 52KB.</span>
+      <span data-zh>AI Agent 时代，你的笔记本应该永远在线。<br>一键开启，零配置，仅 52KB。</span>
+    </p>
+    <div class="hero-actions reveal" style="transition-delay: 0.3s;">
+      <a href="https://github.com/GGG-HHH/AlwaysOn/releases/latest/download/AlwaysOn.zip" class="btn-download">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10"/></svg>
+        <span data-en>Download for Mac</span>
+        <span data-zh>下载 Mac 版</span>
+      </a>
+      <a href="#how-it-works" class="btn-secondary">
+        <span data-en>How it works</span>
+        <span data-zh>如何使用</span>
+      </a>
+    </div>
+    <div class="hero-specs reveal" style="transition-delay: 0.4s;">
+      52KB <span>·</span> macOS 13+ <span>·</span> Apple Silicon & Intel <span>·</span> Pure Swift
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <div class="container">
+    <div class="section-label reveal">
+      <span data-en>Features</span><span data-zh>功能</span>
+    </div>
+    <h2 class="reveal">
+      <span data-en>Everything you need,<br>nothing you don't.</span>
+      <span data-zh>只做一件事，<br>做到极致。</span>
+    </h2>
+    <p class="section-desc reveal">
+      <span data-en>No Electron. No background service. No subscription. A single 52KB binary that does exactly one thing perfectly.</span>
+      <span data-zh>没有 Electron，没有后台服务，没有订阅。一个 52KB 的原生二进制文件，只做一件事。</span>
+    </p>
+
+    <div class="features-grid reveal-stagger">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>
+          <span data-en>One-Click Sleep Prevention</span>
+          <span data-zh>一键防休眠</span>
+        </h3>
+        <p>
+          <span data-en>Disables system sleep entirely — including lid close. Your AI agents, long builds, and overnight downloads keep running without interruption.</span>
+          <span data-zh>完全禁用系统休眠，包括合盖。你的 AI Agent、长时间编译、通宵下载都不会中断。</span>
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔋</div>
+        <h3>
+          <span data-en>Smart Battery Protection</span>
+          <span data-zh>智能电池保护</span>
+        </h3>
+        <p>
+          <span data-en>Monitors battery every 60 seconds. Lid closed at &le;5% &rarr; auto sleep to protect hardware. Lid open &rarr; notification only. Warning at 10%.</span>
+          <span data-zh>每 60 秒监控电量。合盖且电量 &le;5% &rarr; 自动休眠保护硬件。开盖 &rarr; 仅推送通知。10% 时发出警告。</span>
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔑</div>
+        <h3>
+          <span data-en>Zero-Config Privileges</span>
+          <span data-zh>零配置权限</span>
+        </h3>
+        <p>
+          <span data-en>First launch triggers the native macOS password dialog. One password entry, forever passwordless. Only grants access to pmset — nothing else.</span>
+          <span data-zh>首次启动弹出 macOS 原生密码框，输入一次密码即可永久免密。仅授权 pmset 命令，不涉及其他权限。</span>
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">▪</div>
+        <h3>
+          <span data-en>Menu Bar Native</span>
+          <span data-zh>原生菜单栏</span>
+        </h3>
+        <p>
+          <span data-en>Lives in your menu bar with SF Symbols and live battery percentage. Toggle on/off, launch at login. No Dock icon, no clutter.</span>
+          <span data-zh>SF Symbols 图标常驻菜单栏，实时显示电量百分比。开关切换，支持开机自启。无 Dock 图标，不占空间。</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-label reveal">
+      <span data-en>Setup</span><span data-zh>安装</span>
+    </div>
+    <h2 class="reveal">
+      <span data-en>Three steps. Under a minute.</span>
+      <span data-zh>三步完成，不到一分钟。</span>
+    </h2>
+    <p class="section-desc reveal">
+      <span data-en>No terminal. No Homebrew. No Xcode.</span>
+      <span data-zh>不需要终端、Homebrew 或 Xcode。</span>
+    </p>
+
+    <div class="steps reveal-stagger">
+      <div class="step">
+        <div class="step-number">01</div>
+        <h3><span data-en>Download &amp; Open</span><span data-zh>下载并打开</span></h3>
+        <p>
+          <span data-en>Unzip <code>AlwaysOn.zip</code> and drag the app to Applications. First launch: right-click &rarr; Open.</span>
+          <span data-zh>解压 <code>AlwaysOn.zip</code>，将 App 拖入应用程序文件夹。首次启动：右键 &rarr; 打开。</span>
+        </p>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <h3><span data-en>Grant Permission</span><span data-zh>授予权限</span></h3>
+        <p>
+          <span data-en>A native macOS dialog asks for your password — once. This configures passwordless access for the <code>pmset</code> command only.</span>
+          <span data-zh>macOS 原生密码弹窗会要求输入密码 — 仅此一次。这将配置 <code>pmset</code> 命令的免密执行权限。</span>
+        </p>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <h3><span data-en>Click Enable</span><span data-zh>点击启用</span></h3>
+        <p>
+          <span data-en>Hit "Enable AlwaysOn" from the menu bar. Done. Your Mac stays awake with the lid closed, WiFi connected, all processes running.</span>
+          <span data-zh>点击菜单栏中的"Enable AlwaysOn"即可。Mac 合盖后保持唤醒，WiFi 在线，所有进程继续运行。</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Menu Preview + FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="usage-grid">
+      <div class="usage-left">
+        <div class="section-label reveal">
+          <span data-en>Interface</span><span data-zh>界面</span>
+        </div>
+        <h2 class="reveal">
+          <span data-en>Minimal by design.</span>
+          <span data-zh>极简设计。</span>
+        </h2>
+        <div class="reveal" style="transition-delay: 0.15s;">
+          <div class="menu-preview">
+            <div class="menu-bar">⚡ 78%</div>
+            <div class="menu-item active">Disable AlwaysOn</div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span>Battery</span><span class="meta">78%</span></div>
+            <div class="menu-item"><span>Power</span><span class="meta">Battery</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span><span class="menu-check">✓</span>Launch at Login</span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-item" style="color: var(--text-tertiary);">Quit</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label reveal">FAQ</div>
+        <h2 class="reveal" style="margin-bottom: 24px;">
+          <span data-en>Common questions.</span>
+          <span data-zh>常见问题。</span>
+        </h2>
+        <div class="faq-list reveal" style="transition-delay: 0.1s;">
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>
+                <span data-en>Why does macOS say it can't verify the developer?</span>
+                <span data-zh>为什么 macOS 提示「无法验证开发者」？</span>
+              </span>
+              <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="faq-answer"><div class="faq-answer-inner">
+              <span data-en>AlwaysOn is ad-hoc signed (not notarized with Apple). On first launch, right-click the app &rarr; click "Open" &rarr; click "Open" again in the dialog. macOS remembers your choice — you only do this once.</span>
+              <span data-zh>AlwaysOn 使用 ad-hoc 签名（未经 Apple 公证）。首次启动时，右键点击 App &rarr; 选择「打开」&rarr; 在弹窗中再次点击「打开」。macOS 会记住你的选择，之后不会再弹。</span>
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>
+                <span data-en>What exactly does the password prompt do?</span>
+                <span data-zh>密码弹窗具体做了什么？</span>
+              </span>
+              <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="faq-answer"><div class="faq-answer-inner">
+              <span data-en>It creates a single file: <code>/etc/sudoers.d/pmset</code>. This lets the app run <code>pmset</code> (Apple's power management tool) without asking for your password each time. No other commands are affected. The rule is: <code>%admin ALL=(ALL) NOPASSWD: /usr/bin/pmset</code></span>
+              <span data-zh>它只创建了一个文件：<code>/etc/sudoers.d/pmset</code>。这让应用可以免密执行 <code>pmset</code>（Apple 的电源管理工具）。不影响其他任何命令。规则内容：<code>%admin ALL=(ALL) NOPASSWD: /usr/bin/pmset</code></span>
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>
+                <span data-en>Will my MacBook's battery be safe?</span>
+                <span data-zh>电池安全吗？</span>
+              </span>
+              <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="faq-answer"><div class="faq-answer-inner">
+              <span data-en>Yes. The app monitors battery every 60 seconds. At 10% you get a warning notification. At 5% with the lid closed, it automatically disables AlwaysOn and puts your Mac to sleep. With the lid open at 5%, it sends a critical notification so you can plug in.</span>
+              <span data-zh>安全。应用每 60 秒检测电量。10% 时推送警告通知。合盖且低于 5% 时自动关闭 AlwaysOn 并让 Mac 休眠。开盖低于 5% 时发送紧急通知提醒你充电。</span>
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>
+                <span data-en>Does it work with the lid closed?</span>
+                <span data-zh>合盖后还能工作吗？</span>
+              </span>
+              <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="faq-answer"><div class="faq-answer-inner">
+              <span data-en>Yes — that's the whole point. With AlwaysOn enabled, closing the lid only turns off the display. WiFi stays connected, processes keep running, SSH sessions stay alive. Display sleeps after 1 minute on battery, 5 minutes on AC.</span>
+              <span data-zh>当然 — 这就是 AlwaysOn 的核心功能。启用后合盖只关闭屏幕，WiFi 保持连接，进程继续运行，SSH 会话不断开。电池模式下屏幕 1 分钟后熄灭，充电时 5 分钟。</span>
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>
+                <span data-en>How do I completely uninstall it?</span>
+                <span data-zh>如何完全卸载？</span>
+              </span>
+              <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="faq-answer"><div class="faq-answer-inner">
+              <span data-en>Click "Disable" then "Quit" in the menu bar — this restores all default power settings. Delete AlwaysOn.app from Applications. Optionally remove the sudoers rule: <code>sudo rm /etc/sudoers.d/pmset</code></span>
+              <span data-zh>在菜单栏点击 "Disable" 然后 "Quit" — 这会恢复所有默认电源设置。删除应用程序中的 AlwaysOn.app。如需彻底清理，可执行：<code>sudo rm /etc/sudoers.d/pmset</code></span>
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>
+                <span data-en>What happens if I just force-quit the app?</span>
+                <span data-zh>强制退出会怎样？</span>
+              </span>
+              <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="faq-answer"><div class="faq-answer-inner">
+              <span data-en>Sleep will remain disabled until you relaunch AlwaysOn and click "Disable", or manually run <code>sudo pmset -a disablesleep 0</code> in Terminal. The app always tries to restore defaults on quit, but force-quit bypasses that.</span>
+              <span data-zh>防休眠状态会保持，直到你重新打开 AlwaysOn 点击 "Disable"，或在终端手动执行 <code>sudo pmset -a disablesleep 0</code>。正常退出时 App 会自动恢复默认设置，但强制退出会跳过这一步。</span>
+            </div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech -->
+<section id="tech">
+  <div class="container">
+    <div class="section-label reveal">
+      <span data-en>Under the hood</span><span data-zh>技术细节</span>
+    </div>
+    <h2 class="reveal">
+      <span data-en>Built different.</span>
+      <span data-zh>不走寻常路。</span>
+    </h2>
+    <p class="section-desc reveal">
+      <span data-en>No runtime dependencies. No frameworks. Just Swift and system APIs.</span>
+      <span data-zh>无运行时依赖，无第三方框架。纯 Swift + 系统 API。</span>
+    </p>
+    <div class="tech-grid reveal-stagger">
+      <div class="tech-tag"><span class="tag-dot"></span> Pure Swift</div>
+      <div class="tech-tag"><span class="tag-dot"></span> swiftc</div>
+      <div class="tech-tag"><span class="tag-dot"></span> Universal Binary</div>
+      <div class="tech-tag"><span class="tag-dot"></span> AppKit + IOKit</div>
+      <div class="tech-tag"><span class="tag-dot"></span> pmset + caffeinate</div>
+      <div class="tech-tag"><span class="tag-dot"></span> 52KB</div>
+      <div class="tech-tag"><span class="tag-dot"></span> Ad-hoc codesigned</div>
+      <div class="tech-tag"><span class="tag-dot"></span> macOS 13+</div>
+      <div class="tech-tag"><span class="tag-dot"></span> SMAppService</div>
+      <div class="tech-tag"><span class="tag-dot"></span> LSUIElement</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>
+      <span data-en>AlwaysOn — built for machines that never rest.</span>
+      <span data-zh>AlwaysOn — 为永不停歇的机器而生。</span>
+      <a href="https://github.com/GGG-HHH/AlwaysOn">
+        <span data-en>Source on GitHub</span>
+        <span data-zh>GitHub 源码</span>
+      </a>
+    </p>
+  </div>
+</footer>
+
+<script>
+// Language toggle
+function setLang(lang) {
+  document.body.setAttribute('data-lang', lang);
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('.lang-toggle button').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-set-lang') === lang);
+  });
+  localStorage.setItem('alwayson-lang', lang);
+  // Re-calc open FAQ answer heights
+  document.querySelectorAll('.faq-item.open .faq-answer').forEach(el => {
+    el.style.maxHeight = el.scrollHeight + 'px';
+  });
+}
+
+document.querySelectorAll('.lang-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => setLang(btn.getAttribute('data-set-lang')));
+});
+
+// Restore saved language or detect browser
+const saved = localStorage.getItem('alwayson-lang');
+if (saved) {
+  setLang(saved);
+} else if (navigator.language.startsWith('zh')) {
+  setLang('zh');
+}
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => observer.observe(el));
+
+// Trigger hero immediately
+document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('visible'));
+
+// FAQ accordion
+document.querySelectorAll('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const answer = item.querySelector('.faq-answer');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(openItem => {
+      openItem.classList.remove('open');
+      openItem.querySelector('.faq-answer').style.maxHeight = null;
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+  });
+});
+</script>
+</body>
+</html>
