@@ -14,10 +14,10 @@ final class BatteryMonitor {
     struct BatteryInfo {
         let percentage: Int
         let isOnAC: Bool
+        var hasBattery: Bool { percentage >= 0 }
     }
 
     func start() {
-        // Fire immediately, then every 60s
         checkBattery()
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
             self?.checkBattery()
@@ -37,7 +37,8 @@ final class BatteryMonitor {
         let info = readBattery()
         onBatteryUpdate?(info.percentage, info.isOnAC)
 
-        guard !info.isOnAC else { return }
+        // Desktop Macs have no battery — skip all battery logic
+        guard info.hasBattery, !info.isOnAC else { return }
 
         if info.percentage <= criticalThreshold {
             let clamshell = isClamshellClosed()
@@ -56,6 +57,7 @@ final class BatteryMonitor {
               let first = sources.first,
               let desc = IOPSGetPowerSourceDescription(snapshot, first as CFTypeRef)?.takeUnretainedValue() as? [String: Any]
         else {
+            // No power source info — desktop Mac or error
             return BatteryInfo(percentage: -1, isOnAC: true)
         }
 
@@ -77,7 +79,6 @@ final class BatteryMonitor {
         process.waitUntilExit()
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8) ?? ""
-        // Look for "AppleClamshellState" = Yes
         return output.contains("\"AppleClamshellState\" = Yes")
     }
 

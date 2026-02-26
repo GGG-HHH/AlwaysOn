@@ -2,7 +2,7 @@
 
 **Your Mac Never Sleeps.**
 
-In the age of AI agents, your laptop should run forever. AlwaysOn is a 52KB native macOS menu bar app that prevents sleep — including lid close — with smart battery protection.
+In the age of AI agents, your Mac should run forever. AlwaysOn is a 83KB native macOS menu bar app that prevents sleep — including lid close — with smart battery protection. Works on all Macs: MacBook, Mac mini, iMac, Mac Studio, Mac Pro.
 
 [Download](https://github.com/GGG-HHH/AlwaysOn/releases/latest/download/AlwaysOn.zip) · [Website](https://ggg-hhh.github.io/AlwaysOn/)
 
@@ -41,7 +41,7 @@ In the age of AI agents, your laptop should run forever. AlwaysOn is a 52KB nati
 | | |
 |---|---|
 | Language | Pure Swift |
-| Binary | 52KB, Universal (arm64 + x86_64) |
+| Binary | 83KB, Universal (arm64 + x86_64) |
 | Frameworks | AppKit, IOKit, ServiceManagement |
 | Sleep control | `pmset disablesleep` + `caffeinate -ims` |
 | Privilege | `/etc/sudoers.d/pmset` (NOPASSWD for pmset only) |
@@ -85,7 +85,7 @@ MIT
 
 **让你的 Mac 永不休眠。**
 
-AI Agent 时代，你的笔记本应该永远在线。AlwaysOn 是一个 52KB 的原生 macOS 菜单栏应用，防止系统休眠（包括合盖），并内置智能电池保护。
+AI Agent 时代，你的 Mac 应该永远在线。AlwaysOn 是一个 83KB 的原生 macOS 菜单栏应用，防止系统休眠（包括合盖），并内置智能电池保护。支持所有 Mac：MacBook、Mac mini、iMac、Mac Studio、Mac Pro。
 
 [下载](https://github.com/GGG-HHH/AlwaysOn/releases/latest/download/AlwaysOn.zip) · [官网](https://ggg-hhh.github.io/AlwaysOn/)
 

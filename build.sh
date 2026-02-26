@@ -14,8 +14,9 @@ rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$APP_BUNDLE/Contents/Resources"
 
-# Copy Info.plist
+# Copy Info.plist and icon
 cp "$SCRIPT_DIR/Resources/Info.plist" "$APP_BUNDLE/Contents/"
+cp "$SCRIPT_DIR/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
 
 # Build universal binary (arm64 + x86_64)
 TMPDIR_BUILD=$(mktemp -d)

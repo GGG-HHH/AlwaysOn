@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AlwaysOn — Your Mac Never Sleeps</title>
-<meta name="description" content="Turn your Mac into a forever-running machine. A 52KB native menu bar app for the age of AI agents.">
+<meta name="description" content="Turn your Mac into a forever-running machine. A 83KB native menu bar app for the age of AI agents.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -289,7 +290,7 @@ section {
   font-family: var(--mono);
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   color: var(--accent);
   margin-bottom: 16px;
 }
@@ -298,15 +299,16 @@ h2 {
   font-family: var(--mono);
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
-  letter-spacing: -0.03em;
   line-height: 1.15;
+  margin-left: -0.04em;
   margin-bottom: 16px;
 }
 
 .section-desc {
+  font-family: var(--mono);
   color: var(--text-secondary);
-  font-size: 17px;
-  max-width: 520px;
+  font-size: 15px;
+  max-width: 560px;
   margin-bottom: 56px;
 }
 
@@ -339,7 +341,16 @@ h2 {
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
-  font-size: 18px;
+}
+
+.feature-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .feature-card h3 {
@@ -382,7 +393,6 @@ h2 {
   font-size: 48px;
   font-weight: 700;
   color: var(--accent);
-  opacity: 0.15;
   line-height: 1;
   margin-bottom: 16px;
 }
@@ -655,8 +665,8 @@ footer a:hover { color: var(--accent); }
     <div class="reveal">
       <div class="hero-badge">
         <span class="dot"></span>
-        <span data-en>macOS menu bar app</span>
-        <span data-zh>macOS 菜单栏应用</span>
+        <span data-en>MacBook · Mac mini · iMac · Mac Studio · Mac Pro</span>
+        <span data-zh>MacBook · Mac mini · iMac · Mac Studio · Mac Pro</span>
       </div>
     </div>
     <h1 class="reveal" style="transition-delay: 0.1s;">
@@ -664,8 +674,8 @@ footer a:hover { color: var(--accent); }
       <span data-zh>让你的 Mac<br><span class="accent">永不休眠。</span></span>
     </h1>
     <p class="hero-sub reveal" style="transition-delay: 0.2s;">
-      <span data-en>In the age of AI agents, your laptop should run forever.<br>One click. No config. 52KB.</span>
-      <span data-zh>AI Agent 时代，你的笔记本应该永远在线。<br>一键开启，零配置，仅 52KB。</span>
+      <span data-en>In the age of AI agents, your Mac should run forever.<br>One click. No config. 83KB.</span>
+      <span data-zh>AI Agent 时代，你的 Mac 应该永远在线。<br>一键开启，零配置，仅 83KB。</span>
     </p>
     <div class="hero-actions reveal" style="transition-delay: 0.3s;">
       <a href="https://github.com/GGG-HHH/AlwaysOn/releases/latest/download/AlwaysOn.zip" class="btn-download">
@@ -679,7 +689,7 @@ footer a:hover { color: var(--accent); }
       </a>
     </div>
     <div class="hero-specs reveal" style="transition-delay: 0.4s;">
-      52KB <span>·</span> macOS 13+ <span>·</span> Apple Silicon & Intel <span>·</span> Pure Swift
+      Pure Swift <span>·</span> macOS 13+ <span>·</span> Apple Silicon & Intel
     </div>
   </div>
 </section>
@@ -695,13 +705,13 @@ footer a:hover { color: var(--accent); }
       <span data-zh>只做一件事，<br>做到极致。</span>
     </h2>
     <p class="section-desc reveal">
-      <span data-en>No Electron. No background service. No subscription. A single 52KB binary that does exactly one thing perfectly.</span>
-      <span data-zh>没有 Electron，没有后台服务，没有订阅。一个 52KB 的原生二进制文件，只做一件事。</span>
+      <span data-en>No Electron. No background service. No subscription. A single 83KB binary that does exactly one thing perfectly.</span>
+      <span data-zh>没有 Electron，没有后台服务，没有订阅。一个 83KB 的原生二进制文件，只做一件事。</span>
     </p>
 
     <div class="features-grid reveal-stagger">
       <div class="feature-card">
-        <div class="feature-icon">⚡</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
         <h3>
           <span data-en>One-Click Sleep Prevention</span>
           <span data-zh>一键防休眠</span>
@@ -712,7 +722,7 @@ footer a:hover { color: var(--accent); }
         </p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔋</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><path d="M6 11v2"/><path d="M10 11v2"/></svg></div>
         <h3>
           <span data-en>Smart Battery Protection</span>
           <span data-zh>智能电池保护</span>
@@ -723,7 +733,7 @@ footer a:hover { color: var(--accent); }
         </p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔑</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke-width="2.8" stroke-linecap="butt"/></svg></div>
         <h3>
           <span data-en>Zero-Config Privileges</span>
           <span data-zh>零配置权限</span>
@@ -734,7 +744,7 @@ footer a:hover { color: var(--accent); }
         </p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">▪</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="var(--accent)" stroke="none"/></svg></div>
         <h3>
           <span data-en>Menu Bar Native</span>
           <span data-zh>原生菜单栏</span>
@@ -936,7 +946,7 @@ footer a:hover { color: var(--accent); }
       <div class="tech-tag"><span class="tag-dot"></span> Universal Binary</div>
       <div class="tech-tag"><span class="tag-dot"></span> AppKit + IOKit</div>
       <div class="tech-tag"><span class="tag-dot"></span> pmset + caffeinate</div>
-      <div class="tech-tag"><span class="tag-dot"></span> 52KB</div>
+      <div class="tech-tag"><span class="tag-dot"></span> 83KB</div>
       <div class="tech-tag"><span class="tag-dot"></span> Ad-hoc codesigned</div>
       <div class="tech-tag"><span class="tag-dot"></span> macOS 13+</div>
       <div class="tech-tag"><span class="tag-dot"></span> SMAppService</div>

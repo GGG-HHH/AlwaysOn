@@ -6,18 +6,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let powerManager = PowerManager()
     private let batteryMonitor = BatteryMonitor()
     private let loginItemManager = LoginItemManager()
+    private var isDesktop = false
 
     // Menu items that need updating
     private var toggleMenuItem: NSMenuItem!
     private var batteryMenuItem: NSMenuItem!
     private var powerSourceMenuItem: NSMenuItem!
+    private var batterySeparator: NSMenuItem!
     private var loginMenuItem: NSMenuItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Request notification permission early
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
 
-        // Check privileges
         if !PrivilegeManager.hasPasswordlessPmset() {
             let granted = PrivilegeManager.requestPrivileges()
             if !granted {
@@ -31,6 +31,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 return
             }
         }
+
+        // Detect desktop Mac (no battery)
+        let info = batteryMonitor.currentInfo()
+        isDesktop = !info.hasBattery
 
         setupStatusItem()
         setupBatteryMonitor()
@@ -52,7 +56,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         toggleMenuItem.target = self
         menu.addItem(toggleMenuItem)
 
-        menu.addItem(NSMenuItem.separator())
+        batterySeparator = NSMenuItem.separator()
+        menu.addItem(batterySeparator)
 
         batteryMenuItem = NSMenuItem(title: "Battery: --", action: nil, keyEquivalent: "")
         batteryMenuItem.isEnabled = false
@@ -61,6 +66,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         powerSourceMenuItem = NSMenuItem(title: "Power: --", action: nil, keyEquivalent: "")
         powerSourceMenuItem.isEnabled = false
         menu.addItem(powerSourceMenuItem)
+
+        // Hide battery items on desktop Macs
+        if isDesktop {
+            batterySeparator.isHidden = true
+            batteryMenuItem.isHidden = true
+            powerSourceMenuItem.isHidden = true
+        }
 
         menu.addItem(NSMenuItem.separator())
 
@@ -96,11 +108,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func updateBatteryDisplay(percentage: Int, isOnAC: Bool) {
+        guard !isDesktop else { return }
+
         let pctText = percentage >= 0 ? "\(percentage)%" : "--"
         batteryMenuItem.title = "Battery: \(pctText)"
         powerSourceMenuItem.title = "Power: \(isOnAC ? "AC" : "Battery")"
 
-        // Update status bar button text
         if powerManager.isEnabled && percentage >= 0 {
             statusItem.button?.title = " \(pctText)"
         }
@@ -110,12 +123,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard powerManager.isEnabled else { return }
 
         if clamshellClosed {
-            // Lid closed + critical battery → sleep to protect battery
             powerManager.disable()
             powerManager.sleepNow()
             updateMenuState()
         } else {
-            // Lid open + critical battery → notify, don't force sleep
             sendCriticalNotification()
         }
     }
@@ -137,8 +148,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateMenuState() {
         let enabled = powerManager.isEnabled
-        let info = batteryMonitor.currentInfo()
-        let pctText = info.percentage >= 0 ? "\(info.percentage)%" : "--"
 
         toggleMenuItem.title = enabled ? "Disable AlwaysOn" : "Enable AlwaysOn"
         loginMenuItem.state = loginItemManager.isEnabled ? .on : .off
@@ -148,7 +157,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 systemSymbolName: "bolt.fill",
                 accessibilityDescription: "AlwaysOn Active"
             )
-            statusItem.button?.title = " \(pctText)"
+            if !isDesktop {
+                let info = batteryMonitor.currentInfo()
+                let pctText = info.percentage >= 0 ? "\(info.percentage)%" : "--"
+                statusItem.button?.title = " \(pctText)"
+            }
         } else {
             statusItem.button?.image = NSImage(
                 systemSymbolName: "bolt.slash.fill",
@@ -157,8 +170,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             statusItem.button?.title = ""
         }
 
-        batteryMenuItem.title = "Battery: \(pctText)"
-        powerSourceMenuItem.title = "Power: \(info.isOnAC ? "AC" : "Battery")"
+        if !isDesktop {
+            let info = batteryMonitor.currentInfo()
+            let pctText = info.percentage >= 0 ? "\(info.percentage)%" : "--"
+            batteryMenuItem.title = "Battery: \(pctText)"
+            powerSourceMenuItem.title = "Power: \(info.isOnAC ? "AC" : "Battery")"
+        }
     }
 
     // MARK: - Actions
